@@ -8,16 +8,19 @@ from weasyprint import HTML
 client = OpenAI()
 
 resume_text = ""
+folder_path = "./data"
 
-with fitz.open("resume.pdf") as doc:
-    resume_text = "\n".join(page.get_text("text") for page in doc)
-# print(os.environ["OPENAI_API_KEY"])
+for filename in os.listdir(folder_path):
+    if filename.endswith(".pdf"):
+# with fitz.open("resume.pdf") as doc:
+        pdf_path = os.path.join(folder_path, filename)
+        with fitz.open(pdf_path) as doc:
+            resume_text += "\n".join(page.get_text("text") for page in doc)
 
-# print(resume_text)
 
 role = input("What role are you applying for: ")
 
-query_content = f"Help me to optimize my resume for the role of ${role} based on my current resume in markdown format:\n${resume_text}.\nThe output should not contain any other things other than the markdown text"
+query_content = f"Help me to optimize my resume for the role of ${role} based on my current resume in markdown format:\n${resume_text}.\nThe output should only contain information relevant to the resume. Additionally, do pick out what is best related to the field, removing unnecessary information. You should not add additional information that is excessive."
 
 new_resume = client.chat.completions.create(
     model="gpt-4o",
@@ -31,4 +34,4 @@ new_resume = client.chat.completions.create(
 )
 
 html = markdown.markdown(new_resume.choices[0].message.content)
-HTML(string=html).write_pdf("output2.pdf")
+HTML(string=html).write_pdf("output.pdf")
