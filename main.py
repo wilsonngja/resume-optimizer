@@ -12,7 +12,6 @@ folder_path = "./data"
 
 for filename in os.listdir(folder_path):
     if filename.endswith(".pdf"):
-# with fitz.open("resume.pdf") as doc:
         pdf_path = os.path.join(folder_path, filename)
         with fitz.open(pdf_path) as doc:
             resume_text += "\n".join(page.get_text("text") for page in doc)
